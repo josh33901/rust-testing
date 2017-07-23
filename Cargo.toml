@@ -1,0 +1,13 @@
+[package]
+name = "f1-utils"
+version = "0.1.0"
+authors = ["F1ssi0N <josh33901@gmail.com>"]
+
+[lib]
+name = "f1_rust"
+crate-type = ["dylib"]
+
+[dependencies]
+libc = "0.2.26"
+winapi = "0.2"
+kernel32-sys = "0.2.2"
