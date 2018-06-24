@@ -13,7 +13,7 @@ use win32::AsCStr;
 #[no_mangle]
 #[allow(unused_variables)]
 #[allow(non_snake_case)]
-/// Entry point
+/// Entry point.
 pub extern "stdcall" fn DllMain(module: win32::HMODULE, reason_for_call: u32, reserved: *mut libc::c_void) {
 	match reason_for_call {
 		1 => { // DLL_PROCESS_ATTACH
@@ -25,7 +25,7 @@ pub extern "stdcall" fn DllMain(module: win32::HMODULE, reason_for_call: u32, re
 }
 
 extern "thiscall" fn hooked_play_sound(instance: *const u32, sound: *const i8) {
-	log::console("PLAY\nPLAY\nPLAY\nPLAY\nPLAY\nPLAY\nPLAY\nPLAY\nPLAY\nPLAY\nPLAY\n");
+	log::console("PLAY\nPLAY\nPLAY\nPLAY\nPLAY\nPLAY\nPLAY\nPLAY\nPLAY\nPLAY\nPLAY");
 	unsafe{log::console(&std::ffi::CStr::from_ptr(sound).to_string_lossy())};
 }
  

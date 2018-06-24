@@ -1,4 +1,5 @@
 use std;
+use log;
 
 
 // From DS2015
@@ -52,6 +53,7 @@ pub struct VMTHook<T> {
 	old_vtable: *const u32, // pointer to data section
 	real_vtable: *const *const u32,
 	array: Vec<u32>,
+	offset: isize,
 }
 impl <T: VTable> VMTHook<T>  {
 	unsafe fn count_funcs(vmt: *const *const u32) -> isize {
@@ -59,26 +61,30 @@ impl <T: VTable> VMTHook<T>  {
 		let mut i: isize = -1;
 
 		// do while hack
-		while{
-			vmt.offset(i).is_null() == false
-		} { 
-			i += 1
+		loop {
+		    if (*vmt.offset(i)).is_null() == true {
+		    	break;
+		    }
+		    i += 1;
+
 		}
 
 		assert!(i >= 0);
+
+		log::console(&format!("{} total functions\n", i));
 
 		return i;
 	}
 
 	pub fn new(instance: &T, offset: Option<isize>) -> Box<VMTHook<T>> {
-	    let this = unsafe{instance.get_this()};
 	    let real_vtable = unsafe{instance.get_table(offset)};
 
 	    let mut ret: Box<VMTHook<T>> = Box::new(VMTHook{
 	    	this: instance,
-	    	old_vtable: unsafe{*real_vtable as *const u32},
+	    	old_vtable: unsafe{real_vtable as *const u32},
 	    	real_vtable: real_vtable,
 	    	array: Vec::new(),
+	    	offset: offset.unwrap_or(0),
 
 	    });
 
@@ -104,6 +110,12 @@ impl <T: VTable> VMTHook<T>  {
 	}
 
 	pub fn rehook(&mut self) {
-		self.real_vtable = unsafe{&self.array.as_ptr().offset(3) as *const _};
+		log::console("get ptr\n");
+		let mut vtable_ptr = self.real_vtable as *mut *mut u32;
+		log::console(&format!("replace ptr {:p}\n", vtable_ptr));
+		unsafe{std::ptr::write(self.this.offset(self.offset) as *mut _, self.array.as_ptr().offset(3))};
+		log::console("done\n");
+		//log::console(&format!("new address is {:p}\n", vtable_ptr));
+
 	}
 }

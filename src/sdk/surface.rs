@@ -2,6 +2,8 @@ use sdk::vtable::*;
 
 use win32::AsCStr;
 
+use log;
+
 pub struct Surface {
 
 }
